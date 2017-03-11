@@ -18,9 +18,7 @@ impl Clone for Point {
     }
 }
 
-impl Eq for Point {
-
-}
+impl Eq for Point {}
 
 impl PartialEq for Point {
     fn eq(&self, other: &Point) -> bool {
@@ -38,6 +36,7 @@ struct Snake {
     head: Point,
     body: LinkedList<Point>,
     direction: Point,
+    last_removed_body_position: Option<Point>
 }
 
 impl Snake {
@@ -46,16 +45,20 @@ impl Snake {
             head: Point::new(x, y),
             body: LinkedList::new(),
             direction: Point::new(1, 0), // Right
+            last_removed_body_position: None
         }
     }
 
-    pub fn process(&mut self, is_growing: bool) {
+    pub fn movement(&mut self) {
         self.body.push_front(self.head.clone());
         self.head = Point::new(self.head.x + self.direction.x,
                                self.head.y + self.direction.y);
-        if !is_growing {
-            self.body.pop_back();
-        }
+
+        self.last_removed_body_position = self.body.pop_back();
+    }
+
+    pub fn grow(&mut self) {
+        self.body.push_back(self.last_removed_body_position.clone().unwrap());
     }
 }
 
@@ -70,7 +73,9 @@ impl Apple {
 }
 
 fn main() {
-    let window = pancurses::initscr();
+    let screen = pancurses::initscr();
+    let window = pancurses::newwin(40, 40, 20, 20);
+
     let mut rng = rand::thread_rng();
 
     let mut snake = Snake::new(4, 4);
@@ -87,9 +92,10 @@ fn main() {
     pancurses::half_delay(5);
     window.keypad(true);
 
-    snake.process(true);
-    snake.process(true);
-    snake.process(true);
+    snake.movement();
+    snake.grow();
+    snake.movement();
+    snake.grow();
 
     loop {
         match window.getch() {
@@ -102,14 +108,20 @@ fn main() {
             None => (),
         }
 
+        let dead = snake.body.iter().any(|ref body_part| snake.head == **body_part);
+
+        if dead {
+            break;
+        }
+
+        snake.movement();
+
         if snake.head == apple.location {
             let x: i32 = rng.gen_range(0, window.get_max_x());
             let y: i32 = rng.gen_range(0, window.get_max_y());
-            apple = Apple::new(x, y);
 
-            snake.process(true);
-        } else {
-            snake.process(false);
+            apple = Apple::new(x, y);
+            snake.grow()
         }
 
         render(&window, &snake, &apple);
@@ -123,13 +135,14 @@ fn main() {
 
 fn render(window: &pancurses::Window, snake: &Snake, apple: &Apple) {
     window.clear();
-    window.mvprintw(snake.head.y, snake.head.x, "s");
+
+    window.mvprintw(apple.location.y, apple.location.x, "0");
 
     for segment in &snake.body {
         window.mvprintw(segment.y, segment.x, "#");
     }
 
-    window.mvprintw(apple.location.y, apple.location.x, "0");
+    window.mvprintw(snake.head.y, snake.head.x, "s");
 
     window.refresh();
 }
