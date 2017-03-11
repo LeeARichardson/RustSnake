@@ -74,7 +74,7 @@ impl Apple {
 
 fn main() {
     let screen = pancurses::initscr();
-    let window = pancurses::newwin(40, 40, 20, 20);
+    let window = pancurses::newwin(20, 20, 0, 0);
 
     let mut rng = rand::thread_rng();
 
@@ -90,7 +90,7 @@ fn main() {
     pancurses::noecho();
     pancurses::curs_set(0);
     pancurses::half_delay(5);
-    window.keypad(true);
+    screen.keypad(true);
 
     snake.movement();
     snake.grow();
@@ -98,7 +98,7 @@ fn main() {
     snake.grow();
 
     loop {
-        match window.getch() {
+        match screen.getch() {
             Some(pancurses::Input::Character('q')) => break,
             Some(pancurses::Input::KeyLeft) => snake.direction = left.clone(),
             Some(pancurses::Input::KeyRight) => snake.direction = right.clone(),
