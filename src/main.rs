@@ -1,52 +1,15 @@
 extern crate pancurses;
 extern crate rand;
 
-use std::collections::LinkedList;
 use rand::Rng;
 
 mod point;
 
-use point::Point;
+mod snake;
+use snake::Snake;
 
-struct Snake {
-    head: Point,
-    body: LinkedList<Point>,
-    direction: Point,
-    last_removed_body_position: Option<Point>,
-}
-
-impl Snake {
-    pub fn new(x: i32, y: i32) -> Snake {
-        Snake {
-            head: Point::new(x, y),
-            body: LinkedList::new(),
-            direction: Point::new(1, 0), // Right
-            last_removed_body_position: None,
-        }
-    }
-
-    pub fn movement(&mut self) {
-        self.body.push_front(self.head.clone());
-        self.head = Point::new(self.head.x + self.direction.x,
-                               self.head.y + self.direction.y);
-
-        self.last_removed_body_position = self.body.pop_back();
-    }
-
-    pub fn grow(&mut self) {
-        self.body.push_back(self.last_removed_body_position.clone().unwrap());
-    }
-}
-
-struct Apple {
-    location: Point,
-}
-
-impl Apple {
-    pub fn new(x: i32, y: i32) -> Apple {
-        Apple { location: Point { x: x, y: y } }
-    }
-}
+mod apple;
+use apple::Apple;
 
 fn main() {
     let screen = pancurses::initscr();
