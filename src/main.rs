@@ -4,39 +4,15 @@ extern crate rand;
 use std::collections::LinkedList;
 use rand::Rng;
 
-struct Point {
-    x: i32,
-    y: i32,
-}
+mod point;
 
-impl Clone for Point {
-    fn clone(&self) -> Self {
-        Point {
-            x: self.x,
-            y: self.y,
-        }
-    }
-}
-
-impl Eq for Point {}
-
-impl PartialEq for Point {
-    fn eq(&self, other: &Point) -> bool {
-        self.x == other.x && self.y == other.y
-    }
-}
-
-impl Point {
-    pub fn new(x: i32, y: i32) -> Point {
-        Point { x: x, y: y }
-    }
-}
+use point::Point;
 
 struct Snake {
     head: Point,
     body: LinkedList<Point>,
     direction: Point,
-    last_removed_body_position: Option<Point>
+    last_removed_body_position: Option<Point>,
 }
 
 impl Snake {
@@ -45,7 +21,7 @@ impl Snake {
             head: Point::new(x, y),
             body: LinkedList::new(),
             direction: Point::new(1, 0), // Right
-            last_removed_body_position: None
+            last_removed_body_position: None,
         }
     }
 
@@ -81,12 +57,6 @@ fn main() {
     let mut snake = Snake::new(4, 4);
     let mut apple = Apple::new(10, 10);
 
-    let left = Point::new(-1, 0);
-    let right = Point::new(1, 0);
-    let up = Point::new(0, -1);
-    let down = Point::new(0, 1);
-
-
     pancurses::noecho();
     pancurses::curs_set(0);
     pancurses::half_delay(5);
@@ -100,10 +70,10 @@ fn main() {
     loop {
         match screen.getch() {
             Some(pancurses::Input::Character('q')) => break,
-            Some(pancurses::Input::KeyLeft) => snake.direction = left.clone(),
-            Some(pancurses::Input::KeyRight) => snake.direction = right.clone(),
-            Some(pancurses::Input::KeyUp) => snake.direction = up.clone(),
-            Some(pancurses::Input::KeyDown) => snake.direction = down.clone(),
+            Some(pancurses::Input::KeyLeft) => snake.direction = point::LEFT.clone(),
+            Some(pancurses::Input::KeyRight) => snake.direction = point::RIGHT.clone(),
+            Some(pancurses::Input::KeyUp) => snake.direction = point::UP.clone(),
+            Some(pancurses::Input::KeyDown) => snake.direction = point::DOWN.clone(),
             Some(input) => {}
             None => (),
         }
