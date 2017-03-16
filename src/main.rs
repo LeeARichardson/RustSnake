@@ -12,8 +12,11 @@ mod apple;
 use apple::Apple;
 
 fn main() {
+    const GAME_FIELD_WIDTH: i32 = 20;
+    const GAME_FIELD_HEIGHT: i32 = 20;
+
     let screen = pancurses::initscr();
-    let window = pancurses::newwin(20, 20, 0, 0);
+    let window = pancurses::newwin(GAME_FIELD_WIDTH + 1, GAME_FIELD_HEIGHT + 1, 0, 0);
 
     let mut rng = rand::thread_rng();
 
@@ -23,7 +26,11 @@ fn main() {
     pancurses::noecho();
     pancurses::curs_set(0);
     pancurses::half_delay(5);
+    pancurses::start_color();
     screen.keypad(true);
+
+    pancurses::init_pair(1, pancurses::COLOR_GREEN, pancurses::COLOR_BLACK);
+    pancurses::init_pair(0, pancurses::COLOR_WHITE, pancurses::COLOR_BLACK);
 
     snake.movement();
     snake.grow();
@@ -42,8 +49,9 @@ fn main() {
         }
 
         let has_hit_self = snake.body.iter().any(|ref body_part| snake.head == **body_part);
-        let has_hit_wall = snake.head.x <= 0 || snake.head.x >= window.get_max_x() -1 ||
-                           snake.head.y <= 0 || snake.head.y >= window.get_max_y() - 1;
+        let has_hit_wall = snake.head.x <= 0 || snake.head.x >= GAME_FIELD_WIDTH ||
+                           snake.head.y <= 0 ||
+                           snake.head.y >= GAME_FIELD_HEIGHT;
 
         let dead = has_hit_self || has_hit_wall;
 
@@ -54,8 +62,8 @@ fn main() {
         snake.movement();
 
         if snake.head == apple.location {
-            let x: i32 = rng.gen_range(0, window.get_max_x());
-            let y: i32 = rng.gen_range(0, window.get_max_y());
+            let x: i32 = rng.gen_range(0, GAME_FIELD_WIDTH);
+            let y: i32 = rng.gen_range(0, GAME_FIELD_HEIGHT);
 
             apple = Apple::new(x, y);
             snake.grow()
@@ -75,13 +83,16 @@ fn render(window: &pancurses::Window, snake: &Snake, apple: &Apple) {
 
     window.draw_box('|', '-');
 
+    window.color_set(1);
     window.mvprintw(apple.location.y, apple.location.x, "0");
+    window.color_set(0);
 
     for segment in &snake.body {
         window.mvprintw(segment.y, segment.x, "#");
     }
 
     window.mvprintw(snake.head.y, snake.head.x, "s");
+
 
     window.refresh();
 }
