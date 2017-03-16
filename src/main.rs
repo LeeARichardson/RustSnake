@@ -11,6 +11,16 @@ use snake::Snake;
 mod apple;
 use apple::Apple;
 
+fn setup_curses() {
+    pancurses::noecho();
+    pancurses::curs_set(0);
+    pancurses::half_delay(5);
+    pancurses::start_color();
+
+    pancurses::init_pair(1, pancurses::COLOR_GREEN, pancurses::COLOR_BLACK);
+    pancurses::init_pair(0, pancurses::COLOR_WHITE, pancurses::COLOR_BLACK);
+}
+
 fn main() {
     const GAME_FIELD_WIDTH: i32 = 20;
     const GAME_FIELD_HEIGHT: i32 = 20;
@@ -23,14 +33,9 @@ fn main() {
     let mut snake = Snake::new(4, 4);
     let mut apple = Apple::new(10, 10);
 
-    pancurses::noecho();
-    pancurses::curs_set(0);
-    pancurses::half_delay(5);
-    pancurses::start_color();
     screen.keypad(true);
 
-    pancurses::init_pair(1, pancurses::COLOR_GREEN, pancurses::COLOR_BLACK);
-    pancurses::init_pair(0, pancurses::COLOR_WHITE, pancurses::COLOR_BLACK);
+    setup_curses();
 
     snake.movement();
     snake.grow();
