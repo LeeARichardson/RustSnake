@@ -41,7 +41,11 @@ fn main() {
             None => (),
         }
 
-        let dead = snake.body.iter().any(|ref body_part| snake.head == **body_part);
+        let has_hit_self = snake.body.iter().any(|ref body_part| snake.head == **body_part);
+        let has_hit_wall = snake.head.x <= 0 || snake.head.x >= window.get_max_x() -1 ||
+                           snake.head.y <= 0 || snake.head.y >= window.get_max_y() - 1;
+
+        let dead = has_hit_self || has_hit_wall;
 
         if dead {
             break;
@@ -68,6 +72,8 @@ fn main() {
 
 fn render(window: &pancurses::Window, snake: &Snake, apple: &Apple) {
     window.clear();
+
+    window.draw_box('|', '-');
 
     window.mvprintw(apple.location.y, apple.location.x, "0");
 
