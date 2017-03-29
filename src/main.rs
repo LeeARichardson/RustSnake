@@ -4,6 +4,7 @@ extern crate rand;
 use rand::Rng;
 
 mod point;
+use point::Point;
 
 mod snake;
 use snake::Snake;
@@ -30,6 +31,7 @@ fn main() {
 
     let mut rng = rand::thread_rng();
 
+    let points = [Point; GAME_FIELD_WIDTH as usize * GAME_FIELD_HEIGHT as usize;
     let mut snake = Snake::new(4, 4);
     let mut apple = Apple::new(10, 10);
 
@@ -53,7 +55,7 @@ fn main() {
             None => (),
         }
 
-        let has_hit_self = snake.body.iter().any(|ref body_part| snake.head == **body_part);
+        let has_hit_self = snake.body.iter().any(|body_part| *snake.head == **body_part);
         let has_hit_wall = snake.head.x <= 0 || snake.head.x >= GAME_FIELD_WIDTH ||
                            snake.head.y <= 0 ||
                            snake.head.y >= GAME_FIELD_HEIGHT;
@@ -66,7 +68,7 @@ fn main() {
 
         snake.movement();
 
-        if snake.head == apple.location {
+        if *snake.head == apple.location {
             let x: i32 = rng.gen_range(0, GAME_FIELD_WIDTH);
             let y: i32 = rng.gen_range(0, GAME_FIELD_HEIGHT);
 

@@ -6,3 +6,4 @@ authors = ["Lee Richardson <>"]
 [dependencies]
 pancurses = "0.8.0"
 rand = "0.3"
+num = "*"
